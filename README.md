@@ -8,11 +8,13 @@
 5、归一化  
 6、分帧  
 7、对分帧信号加窗  
-8、把分帧信号复原  
+8、把分帧信号复原   
+9、绘制小波时频图  
 需要的环境：  
 '''  
     python-version>=3.6  
     pip install pywavelets  
     pip install numpy  
     pip install scipy  
+    pip install matplotlib  
 '''  
