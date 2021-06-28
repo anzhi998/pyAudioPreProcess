@@ -1,6 +1,7 @@
 import numpy as np
 import pywt as wt
 from scipy import signal
+import matplotlib.pyplot as plt
 '''
     python-version>=3.6
     pip install pywavelets
@@ -62,6 +63,8 @@ def enFrames(x,wlen,inc):
     :return:
     '''
     #加窗分帧
+    wlen=int(wlen)
+    inc=int(inc)
     nx=len(x)
     if nx<=wlen:
         nf=1
@@ -99,5 +102,20 @@ def deFrames(frames,win,inc,N):
     for frame in frames:
         signal[index*inc:index*inc+win]+=frame
         index+=1
-    signal.resize(N)
+    np.resize(signal,N)
     return signal
+def drawTF(signal,fs,N=64):
+    '''
+    绘制信号的连续小波变换时频图
+    :param signal: 原始信号
+    :param fs:采样率
+    :param N: 小波变换阶数
+
+    '''
+    coefs, freqs = cwt(signal, fs, 'morl', N)
+    t = np.arange(0, len(signal)/fs, 1.0 / fs)
+    plt.pcolormesh(t,freqs,abs(coefs),cmap='jet',vmin=0,vmax=3)
+    plt.xlabel('t/s')
+    plt.ylabel("f/HZ")
+    plt.colorbar()
+    plt.show()
