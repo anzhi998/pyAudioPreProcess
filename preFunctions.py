@@ -1,5 +1,6 @@
 import numpy as np
 import pywt as wt
+from numpy.fft import fft
 from scipy import signal
 import matplotlib.pyplot as plt
 '''
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
     pip install pywavelets
     pip install numpy
     pip install scipy
+    pip install matplotlib
 '''
 def cwt(data,fs,wavename,scale):
     #连续小波变换
@@ -35,7 +37,7 @@ def bandPassFilter(N,fs,wl,wh):
     :param wh: FH
     :return: 滤波器参数b,a
     '''
-    b,a=signal.butter(N,[2*wl/fs,2*wh*fs],'bandpass')
+    b,a=signal.butter(N,[2*wl/fs,2*wh/fs],'bandpass')
     return b,a
 def filterSig(data,b,a):
     '''
@@ -95,6 +97,8 @@ def deFrames(frames,win,inc,N):
     :param N: 原信号长度
     :return:恢复后的信号
     '''
+    win=int(win)
+    inc=int(inc)
     nf=frames.shape[0]
     nx=nf*inc-inc+win
     index=0
@@ -102,8 +106,9 @@ def deFrames(frames,win,inc,N):
     for frame in frames:
         signal[index*inc:index*inc+win]+=frame
         index+=1
-    np.resize(signal,N)
-    return signal
+    #np.resize(signal,N)
+
+    return signal[0:N]
 def drawTF(signal,fs,N=64):
     '''
     绘制信号的连续小波变换时频图
@@ -118,4 +123,18 @@ def drawTF(signal,fs,N=64):
     plt.xlabel('t/s')
     plt.ylabel("f/HZ")
     plt.colorbar()
+    plt.show()
+def drawTimeFFt(signal, sampling_rate):
+    duration = len(signal) / float(sampling_rate)
+    #signal=normalization(signal)
+    plt.subplot(211)
+    plt.plot(np.arange(0,duration,float(1/sampling_rate)),signal)
+    plt.title('time domain')
+    num_fft=int(sampling_rate*duration/2)
+    fft_magnitude = abs(fft(signal))
+    fft_magnitude = fft_magnitude[0:num_fft]
+    plt.subplot(212)
+    freq=np.arange(0,sampling_rate/2,sampling_rate/(2*num_fft))
+    plt.plot(freq, fft_magnitude, 'black')
+    plt.title('fft domain')
     plt.show()
